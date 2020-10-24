@@ -6,7 +6,7 @@ import socket
 import time
 
 version = '0.01'
-host = '176.46.100.55'
+host = '139.162.136.115'
 port = 12345
 pid = 0
 
