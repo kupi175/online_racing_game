@@ -5,22 +5,23 @@ import socket
 # import pyglet
 import time
 
+#info about the default ip and port
 version = '0.01'
 host = '139.162.136.115'
 port = 12345
-pid = 0
 
-soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+#create the socket and form address
+socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 addr = (host, port)
 
+#try to connect to ip:port
 try:
-    soc.connect(addr)
-    soc.send(str.encode('tst'))
-except:
-    pass
+    socket.connect(addr)
+except Exception as e:
+    print(e)
+
 timestamp = time.time()
 while True:
-    print(soc.recv(1024 * 2).decode('utf-8'))
+    print(socket.recv(1024 * 2).decode('utf-8'))
     print(1 / (time.time() - timestamp))
     timestamp = time.time()

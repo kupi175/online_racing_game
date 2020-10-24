@@ -1,25 +1,16 @@
 #!/usr/bin/env python3
 
-import socket
-# import pyckle
 import multiprocessing
 import sys
 import time
-
-min_version = 0.01
 
 # host and port
 host = ''
 port = 12345
 
-processes = []
 
-socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-
-def multip_client(connection, pid):
+def multip_client(connection):
     sys.stdout.flush()
-    conn.recv(2048)
     timestamp = time.time() + 0.01
     while True:
         try:
@@ -30,9 +21,11 @@ def multip_client(connection, pid):
             print(e)
             break
 
+def network_connection_handler():
+    import socket
 
-# ensure only main has access to code beyond this
-if __name__ == '__main__':
+    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     try:
         # try to bind a socket
         socket.bind((host, port))
@@ -43,17 +36,27 @@ if __name__ == '__main__':
     # listen to binded socket
     try:
         socket.listen()
-        print('Server started, waiting for connection')
+        print('Server waiting for connections')
     except Exception as e:
         # print out error without crashing
         print(e)
+
     # while loop for accepting new player connections
-    c_pid = 0
     while True:
-        conn, addr = socket.accept()
-        print('Connected to:', addr)
+        conn, address = socket.accept()
+        print('Connected to:', address)
 
         # create a new process for the connection and run it.
-        process = multiprocessing.Process(target=multip_client, args=(conn, c_pid))
+        process = multiprocessing.Process(target=multip_client, args=(conn))
+        process.daemon = True
         process.start()
-        c_pid += 1
+
+
+
+
+# ensure only main has access to code beyond this
+if __name__ == '__main__':
+    # initialise network connection handler
+    nch = multiprocessing.Process(target=network_connection_handler)
+    while True:
+        pass
