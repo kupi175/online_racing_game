@@ -21,6 +21,7 @@ def multip_client(connection):
             print(e)
             break
 
+
 def network_connection_handler():
     import socket
 
@@ -50,8 +51,6 @@ def network_connection_handler():
         process = multiprocessing.Process(target=multip_client, args=(conn))
         process.daemon = True
         process.start()
-
-
 
 
 # ensure only main has access to code beyond this
