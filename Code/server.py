@@ -10,7 +10,7 @@ port = 12345
 
 
 def multip_client(connection):
-    sys.stdout.flush()
+
     timestamp = time.time() + 0.01
     while True:
         try:
@@ -22,8 +22,9 @@ def multip_client(connection):
             break
 
 
-def network_connection_handler():
+def network_connection_handler(host,port):
     import socket
+    sys.stdout.flush()
 
     socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -56,6 +57,7 @@ def network_connection_handler():
 # ensure only main has access to code beyond this
 if __name__ == '__main__':
     # initialise network connection handler
-    nch = multiprocessing.Process(target=network_connection_handler)
+    nch = multiprocessing.Process(target=network_connection_handler, args=(host,port))
+    nch.start()
     while True:
         pass
