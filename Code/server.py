@@ -8,7 +8,6 @@ import time
 host = ''
 port = 12345
 
-global user_queue
 
 
 def multip_client(connection, address):
@@ -44,23 +43,21 @@ def player_handler(host, port):  # handle new players
         # print out error without crashing
         print(e)
 
+
     # while loop for accepting new player connections
     while True:
         conn, address = socket.accept()
         print('Connected to:', address)
 
         # create a new process for the connection and run it.
-        process = threading.Process(target=multip_client, args=(conn, address))
-        process.start()
-        print('before')
-        process.join()
-        print('after')
+        thread = threading.Thread(target=multip_client, args=(conn, address))
+        thread.start()
 
 
 # ensure only main has access to code beyond this
 if __name__ == '__main__':
     # initialise network connection handler
-    nch = threading.Process(target=player_handler, args=(host, port))
+    nch = threading.Thread(target=player_handler, args=(host, port), daemon = True)
     nch.start()
     while True:
         pass
