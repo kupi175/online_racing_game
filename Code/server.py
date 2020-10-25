@@ -10,16 +10,7 @@ port = 12345
 
 
 
-def multip_client(connection, address):
-    timestamp = time.time() + 0.01
-    while True:
-        try:
-            if 0 > (timestamp - time.time()):
-                connection.send(str.encode('tst'))
-                timestamp += 0.01
-        except Exception as e:
-            print('player', address, 'disconnected: ', e)
-            break
+
 
 
 def player_handler(host, port):  # handle new players
@@ -50,7 +41,7 @@ def player_handler(host, port):  # handle new players
         print('Connected to:', address)
 
         # create a new process for the connection and run it.
-        thread = threading.Thread(target=multip_client, args=(conn, address))
+
         thread.start()
 
 
