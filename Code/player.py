@@ -11,20 +11,19 @@ class player:
     socket = None
     imh = None  # incoming message handler
 
-    id = -1
     is_running = True
 
-    def __init__(self, connection, address, socket, id):
+    def __init__(self, connection, address):
         self.connection = connection
         self.address = address
-        self.socket = socket
         self.id = id
         self.imh = threading.Thread(target=self.incoming_message_handler)
+        self.imh.start()
 
     def incoming_message_handler(self):
         while True:
             try:
-                self.message_queue.append(self.socket.recv(1024 * self.string_multiplayer))
+                self.message_queue.append(self.connection.recv(1024 * self.string_multiplayer))
             except Exception as e:
                 print('player', self.address, 'has dissconnected with:', e)
                 break
