@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import multiprocessing
+import threading
 import sys
 import time
 
@@ -8,9 +8,10 @@ import time
 host = ''
 port = 12345
 
+global user_queue
 
-def multip_client(connection):
 
+def multip_client(connection, address):
     timestamp = time.time() + 0.01
     while True:
         try:
@@ -18,11 +19,11 @@ def multip_client(connection):
                 connection.send(str.encode('tst'))
                 timestamp += 0.01
         except Exception as e:
-            print(e)
+            print('player', address, 'disconnected: ', e)
             break
 
 
-def network_connection_handler(host,port):
+def player_handler(host, port):  # handle new players
     import socket
     sys.stdout.flush()
 
@@ -49,15 +50,17 @@ def network_connection_handler(host,port):
         print('Connected to:', address)
 
         # create a new process for the connection and run it.
-        process = multiprocessing.Process(target=multip_client, args=(conn))
-        process.daemon = True
+        process = threading.Process(target=multip_client, args=(conn, address))
         process.start()
+        print('before')
+        process.join()
+        print('after')
 
 
 # ensure only main has access to code beyond this
 if __name__ == '__main__':
     # initialise network connection handler
-    nch = multiprocessing.Process(target=network_connection_handler, args=(host,port))
+    nch = threading.Process(target=player_handler, args=(host, port))
     nch.start()
     while True:
         pass
