@@ -2,7 +2,7 @@
 
 import sys
 import threading
-from Code.player import player as player
+from Code.server_side.player import player as player
 
 # host and port
 host = ''
