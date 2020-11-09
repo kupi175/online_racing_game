@@ -24,7 +24,7 @@ class player:
     def incoming_message_handler(self):
         while True:
             try:
-                self.message_queue.append(self.connection.recv(1024 * self.string_multiplayer))
+                self.message_queue.append(self.connection.recv(1024 * self.string_multiplayer).decode('utf-8'))
                 print(self.message_queue)
             except Exception as e:
                 print('player', self.address, 'has dissconnected with:', e)

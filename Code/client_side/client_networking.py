@@ -29,7 +29,7 @@ class connection:
     def incoming_message_handler(self):
         while True:
             try:
-                self.message_queue.append(self.socket.recv(1024 * self.string_multiplayer))
+                self.message_queue.append(self.socket.recv(1024 * self.string_multiplayer).decode('utf-8'))
             except Exception as e:
                 print(e)
                 break
