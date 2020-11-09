@@ -4,7 +4,7 @@ import threading
 class player:
     string_multiplayer = 2
 
-    message_queue = []
+    message_queue = None
 
     connection = None
     address = None
@@ -14,6 +14,7 @@ class player:
     is_running = True
 
     def __init__(self, connection, address):
+        self.message_queue = list()
         self.connection = connection
         self.address = address
         self.id = id
@@ -24,6 +25,7 @@ class player:
         while True:
             try:
                 self.message_queue.append(self.connection.recv(1024 * self.string_multiplayer))
+                print(self.message_queue)
             except Exception as e:
                 print('player', self.address, 'has dissconnected with:', e)
                 break

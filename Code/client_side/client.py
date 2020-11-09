@@ -1,27 +1,18 @@
 #!/usr/bin/env python3
 
 import socket
-# import multiprocessing
-# import pyglet
 import time
+# import pyglet
+import Code.client_side.client_networking as netw
 
-# info about the default ip and port
-version = '0.01'
-host = '127.0.0.1'  # 139.162.136.115
-port = 12345
+networking = netw.connection()
 
-# create the socket and form address
-socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-addr = (host, port)
-
-# try to connect to ip:port
-try:
-    socket.connect(addr)
-except Exception as e:
-    print(e)
-
-timestamp = time.time()
+time.sleep(1)
+networking.send_message(msg = 'siin')
+time.sleep(1)
+networking.send_message(msg = 'on')
+time.sleep(1)
+networking.send_message(msg = 'hea')
 while True:
-    print(socket.recv(1024 * 2).decode('utf-8'))
-    print((time.time() - timestamp))
-    timestamp = time.time()
+    print (networking.get_messages())
+    time.sleep(1)
