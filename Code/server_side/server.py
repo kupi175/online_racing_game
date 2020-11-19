@@ -8,8 +8,8 @@ from Code.server_side.server_networking import player as player
 host = ''
 port = 12345
 
-global available_player_pool
-available_player_pool = set()
+general_player_pool = set()
+queued_player_pool = set()
 '''
 Todo: create a game creators
  random matchmaking: start with random map settings. create a player pool to take players out of when the critical mass has been reached after a race players are deposited back into the player pool
