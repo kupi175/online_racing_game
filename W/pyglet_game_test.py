@@ -16,7 +16,7 @@ xmod = 2
 playerRadius = 40
 ver = 'alpha 0.002'
 
-window = pyglet.window.Window(width=1200, height=900, caption='test game', resizable=False, vsync=False )
+window = pyglet.window.Window(width=1200, height=900, caption='test game', resizable=False, vsync=False)
 #window.set_location(650, 250)
 batch = pyglet.graphics.Batch()
 fps_display = FPSDisplay(window)

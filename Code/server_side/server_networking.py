@@ -31,7 +31,7 @@ class player:
                 break
 
     def get_messages(self):
-        outbound = self.message_queue
+        outbound = list(self.message_queue)
         self.message_queue = []
         return outbound
 
