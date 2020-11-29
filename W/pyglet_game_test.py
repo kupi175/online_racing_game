@@ -3,7 +3,7 @@ import pyglet
 from pyglet.window import key, FPSDisplay, mouse
 from pyglet import shapes
 from random import randint
-import UI
+#import UI
 
 playersFail = open('players.txt').read().split('\n')  # loeb playerite asukohad
 players = []
@@ -43,13 +43,13 @@ def otherPlayers(numOtherPlayers):
     return otherPlayers
 otherPlayersList = otherPlayers(2)
 
-def collision(rigth=False,left=False,up=False,down=False):  # vaatab, kas player on collisionis hetkel seinaga, mille nimi on rect
+def collision():  # vaatab, kas player on collisionis hetkel seinaga, mille nimi on rect
     global velx
     global vely
     colSide = {
-        rigth: False,
-        left: False,
-        down: False,
+        'rigth': False,
+        'left': False,
+        'down': False,
     }
 
     if player.y+player.radius > rect.y and player.y-player.radius < rect.y+rect.height: #collision detection parem-vasak
