@@ -3,6 +3,7 @@ import pyglet
 from pyglet.window import key, FPSDisplay, mouse
 from pyglet import shapes
 from random import randint
+import UI
 
 playersFail = open('players.txt').read().split('\n')  # loeb playerite asukohad
 players = []
@@ -48,11 +49,10 @@ def collision(rigth=False,left=False,up=False,down=False):  # vaatab, kas player
     colSide = {
         rigth: False,
         left: False,
-        up: False,
-        down: False
+        down: False,
     }
 
-    if player.y+player.radius > rect.y and player.y-player.radius < rect.y+rect.height:
+    if player.y+player.radius > rect.y and player.y-player.radius < rect.y+rect.height: #collision detection parem-vasak
         if rect.x-2 < player.x+player.radius < rect.x+10:
             print('left')
             colSide['left'] = True
@@ -63,24 +63,25 @@ def collision(rigth=False,left=False,up=False,down=False):  # vaatab, kas player
             colSide['right'] = True
         else:
             colSide['right'] = False
-    if rect.x-2 < player.x+player.radius and player.x-player.radius > rect.x+rect.width+2:
-        if rect.y-2 < player.y + player.radius < rect.y+10:
+
+    if rect.x-2 < player.x+player.radius and player.x-player.radius < rect.x+rect.width+2: # alumine col.detect
+        if rect.y-2 < player.y + player.radius < rect.y:
             print('down')
             colSide['down'] = True
         else:
             colSide['down'] = False
-        if rect.y+rect.width-10 < player.y - player.radius < rect.y+rect.width + 2:
-            print('up')
-            colSide['up'] = True
-        else:
-            colSide['up'] = False
     #print(colSide)
-    if rect.x < player.x+player.radius and player.x-player.radius < rect.x+rect.width:
-        if rect.y <= player.y+player.radius and player.y-player.radius <= rect.y+rect.height:
-            velx = 0
+    #if rect.x < player.x+player.radius and player.x-player.radius < rect.x+rect.width:
+    #    if rect.y <= player.y+player.radius and player.y-player.radius <= rect.y+rect.height:
+    #        velx = 0
+    if colSide['right'] == True or colSide['left'] == True:
+        velx = 0
+        return True
+    if colSide['down'] == True:
+        vely = 0
 
         #print('collision')
-            return True
+            #return True
     else:
         #print('no collision')
         return False
@@ -138,10 +139,14 @@ def on_key_release(symbol, modifiers):
 
     if symbol == key.UP:
         vely -= 3
-    
+
 #event_logger = pyglet.window.event.WindowEventLogger()
 #window.push_handlers(event_logger)
 
 pyglet.clock.schedule_interval(draw_everything, 1/120)
-if __name__ == '__main__':
+
+print(__name__)
+if __name__ == 'pyglet_game_test':
     pyglet.app.run()
+elif __name__ == '__main__':
+    import UI
