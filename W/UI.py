@@ -12,7 +12,7 @@ batchMenu = pyglet.graphics.Batch()
 exitButton = shapes.Rectangle(1200//2-150, 100, 300, 100, button_color, batch=batchMenu)
 exitButtonState = 0
 exitText = pyglet.text.Label('EXIT', font_size=36, x = exitButton.x+exitButton.width//2, y = exitButton.y+exitButton.height//2, batch=batchMenu, anchor_x = 'center', anchor_y='center')
-
+#git test
 def draw_everything(dt):
     global exitButtonState
     if exitButtonState == 1:
