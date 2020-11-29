@@ -47,7 +47,7 @@ def collision():  # vaatab, kas player on collisionis hetkel seinaga, mille nimi
     global velx
     global vely
     colSide = {
-        'rigth': False,
+        'right': False,
         'left': False,
         'down': False,
     }
@@ -79,6 +79,7 @@ def collision():  # vaatab, kas player on collisionis hetkel seinaga, mille nimi
         return True
     if colSide['down'] == True:
         vely = 0
+        return True
 
         #print('collision')
             #return True
@@ -138,7 +139,7 @@ def on_key_release(symbol, modifiers):
         velx = 0
 
     if symbol == key.UP:
-        vely -= 3
+        vely -= 0
 
 #event_logger = pyglet.window.event.WindowEventLogger()
 #window.push_handlers(event_logger)
