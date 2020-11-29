@@ -13,13 +13,14 @@ class player:
 
     is_running = True
 
-    def __init__(self, connection, address):
+    def __init__(self, connection, address, msg = 'you have connected'):
         self.message_queue = list()
         self.connection = connection
         self.address = address
         self.id = id
         self.imh = threading.Thread(target=self.incoming_message_handler)
         self.imh.start()
+        self.connection.send(str.encode(msg))
 
     def incoming_message_handler(self):
         while True:

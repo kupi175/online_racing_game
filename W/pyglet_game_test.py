@@ -24,7 +24,7 @@ fps_display.label.font_size = 20
 for i in range(len(players)):
     player = shapes.Circle(int(players[1][0]), int(players[1][1]), radius=playerRadius, color=(55, 55, 255), batch=batch)
 rect = shapes.Rectangle(400, 100,100,500,(255,45,56), batch=batch)
-rect2 = shapes.Rectangle(0, 0,100,50,(255,255,56), batch=batch)
+#rect2 = shapes.Rectangle(0, 0,100,50,(255,255,56), batch=batch)
 
 label = pyglet.text.Label('Py test game', font_size=26, x=window.width//2, y=window.height//2+300, anchor_x='center',
                           anchor_y='center', batch=batch)
