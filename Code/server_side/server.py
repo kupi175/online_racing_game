@@ -38,18 +38,15 @@ def player_creator(host, port):  # handle new players
         print(e)
 
     # while loop for accepting new player connections
-    global available_player_pool
+    global general_player_pool
     while True:
         conn, address = socket.accept()
         try:
             player_object = player(conn, address)
-            available_player_pool.add(player_object)
+            general_player_pool.add(player_object)
             print('Connected to:', address)
         except Exception as e:
             print(e)
-
-
-        # create a new process for the connection and run it.
 
 
 # ensure only main has access to code beyond this

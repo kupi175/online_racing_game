@@ -5,7 +5,7 @@ import socket
 class connection:
     port = 12345
     version = '0.01'
-    host = '127.0.0.1'  # 139.162.136.115
+    host = '139.162.136.115'
     string_multiplayer = 2
     socket = None
     addr = None
@@ -14,13 +14,15 @@ class connection:
 
     message_queue = []
 
-    def __init__(self):
+    def __init__(self, host = '127.0.0.1', port = 12345):
+        self.port = port
+        self.host = host
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.addr = (self.host, self.port)
 
         try:
             self.socket.connect(self.addr)
-            print('connected')
+            print(self.socket.recv(1024 * self.string_multiplayer).decode('utf-8'))
         except Exception as e:
             print(e)
 
