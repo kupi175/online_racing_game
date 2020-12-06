@@ -3,6 +3,7 @@ import pyglet
 from pyglet.window import key, FPSDisplay, mouse
 from pyglet import shapes
 from random import randint
+import gameObjects
 #import UI
 
 playersFail = open('players.txt').read().split('\n')  # loeb playerite asukohad
@@ -10,6 +11,7 @@ players = []
 for i in playersFail:
     i= i.split(',')
     players.append(i)
+playersLen = len(players)
 velx = 0
 vely = 0.5
 ymod = 3
@@ -22,10 +24,15 @@ window = pyglet.window.Window(width=1200, height=900, caption='test game', resiz
 batch = pyglet.graphics.Batch()
 fps_display = FPSDisplay(window)
 fps_display.label.font_size = 20
+objects = players.copy()
 for i in range(len(players)):
     player = shapes.Circle(int(players[1][0]), int(players[1][1]), radius=playerRadius, color=(55, 55, 255), batch=batch)
-rect = shapes.Rectangle(400, 100,100,500,(255,45,56), batch=batch)
+
+#rect = shapes.Rectangle(400, 100 ,100,500,(255,45,56), batch=batch)
 #rect2 = shapes.Rectangle(0, 0,100,50,(255,255,56), batch=batch)
+rect = []
+for i in objects:
+    rect.append(shapes.Rectangle(int(i[0]), int(i[1]) ,100,50,(255,255,56), batch=batch))
 
 label = pyglet.text.Label('Py test game', font_size=26, x=window.width//2, y=window.height//2+300, anchor_x='center',
                           anchor_y='center', batch=batch)
@@ -51,25 +58,25 @@ def collision():  # vaatab, kas player on collisionis hetkel seinaga, mille nimi
         'left': False,
         'down': False,
     }
+    for i in rect:
+        if player.y+player.radius > i.y and player.y-player.radius < i.y+i.height: #collision detection parem-vasak
+            if i.x-2 < player.x+player.radius < i.x+10:
+                print('left')
+                colSide['left'] = True
+            else:
+                colSide['left'] = False
+            if i.x+i.width-10 < player.x-player.radius < i.x+i.width+2:
+                print('right')
+                colSide['right'] = True
+            else:
+                colSide['right'] = False
 
-    if player.y+player.radius > rect.y and player.y-player.radius < rect.y+rect.height: #collision detection parem-vasak
-        if rect.x-2 < player.x+player.radius < rect.x+10:
-            print('left')
-            colSide['left'] = True
-        else:
-            colSide['left'] = False
-        if rect.x+rect.width-10 < player.x-player.radius < rect.x+rect.width+2:
-            print('right')
-            colSide['right'] = True
-        else:
-            colSide['right'] = False
-
-    if rect.x-2 < player.x+player.radius and player.x-player.radius < rect.x+rect.width+2: # alumine col.detect
-        if rect.y-2 < player.y + player.radius < rect.y:
-            print('down')
-            colSide['down'] = True
-        else:
-            colSide['down'] = False
+        if i.x-2 < player.x+player.radius and player.x-player.radius < i.x+i.width+2: # alumine col.detect
+            if i.y-2 < player.y + player.radius < i.y:
+                print('down')
+                colSide['down'] = True
+            else:
+                colSide['down'] = False
     #print(colSide)
     #if rect.x < player.x+player.radius and player.x-player.radius < rect.x+rect.width:
     #    if rect.y <= player.y+player.radius and player.y-player.radius <= rect.y+rect.height:
