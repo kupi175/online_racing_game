@@ -14,7 +14,7 @@ class connection:
 
     message_queue = []
 
-    def __init__(self, host = '139.162.136.115', port = 12345):
+    def __init__(self, host = '127.0.0.1', port = 12345):
         self.port = port
         self.host = host
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
