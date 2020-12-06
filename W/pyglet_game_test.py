@@ -4,7 +4,7 @@ from pyglet.window import key, FPSDisplay, mouse
 from pyglet import shapes
 from random import randint
 import gameObjects
-import map_generator
+import Code.duplicated.map_generator as mg
 #import UI
 
 playersFail = open('players.txt').read().split('\n')  # loeb playerite asukohad
@@ -32,7 +32,8 @@ for i in range(len(players)):
 #rect = shapes.Rectangle(400, 100 ,100,500,(255,45,56), batch=batch)
 #rect2 = shapes.Rectangle(0, 0,100,50,(255,255,56), batch=batch)
 seed = 69420
-kaart = map_generator.game_map.get_map(start=1,end=2)
+kaart = mg.game_map(seed, 100)
+kaart.get_map(start=1, end=2)
 rect = []
 for i in objects:
     rect.append(shapes.Rectangle(int(i[0]), int(i[1]) ,100,50,(255,255,56), batch=batch))
