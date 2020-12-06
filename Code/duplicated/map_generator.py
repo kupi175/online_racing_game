@@ -28,7 +28,7 @@ class game_map:
         return tuple(ret1, ret2)
 
     def get_noise_point(self, x, y):
-        return (self.noise.noise2d(x / 10, y / 10) + 1) /
+        return (self.noise.noise2d(x / 10, y / 10) + 1) / 2
 
     def get_seed(self):
         return self.seed
