@@ -10,6 +10,7 @@ import pyglet
 from pyglet.window import key, FPSDisplay, mouse
 from pyglet import shapes
 from random import randint
+import time
 import map_generator as mg
 
 # import UI
@@ -21,13 +22,13 @@ for i in playersFail:
     players.append(i)
 playersLen = len(players)
 velx = 0
-vely = 0.5
+vely = 1
 ymod = 3
 xmod = 2
 playerRadius = 40
 ver = 'alpha 0.003'
 
-window = pyglet.window.Window(width=1200, height=900, caption='test game', resizable=False, vsync=False)
+window = pyglet.window.Window(width=1200, height=1100, caption='test game', resizable=False, vsync=False)
 batch = pyglet.graphics.Batch()
 batch2 = pyglet.graphics.Batch()
 fps_display = FPSDisplay(window)
@@ -37,9 +38,9 @@ for i in range(len(players)):
     player = shapes.Circle(x=int(window.width//2), y=int(players[1][1]), radius=playerRadius, color=(55, 55, 255),
                            batch=batch)
 
-seed = 150
+seed = int(time.time()//randint(1, 1000))
 kaart = mg.game_map(seed, 100)
-kaardiAtribuudid = kaart.get_map(start=0, end=50)
+kaardiAtribuudid = kaart.get_map(start=0, end=40)
 dst, ofs = kaardiAtribuudid
 laiuseKordaja = 400
 blokiKõrgus = 30
@@ -124,7 +125,7 @@ def collision():  # vaatab, kas player on collisionis hetkel seinaga, mille nimi
         return False
 
 
-def update(velx):
+def update(velx, vely):
     player.x += velx
     if collision():
         player.y += 0.1
@@ -144,7 +145,7 @@ def draw_everything(dt):
     fps_display.draw()
     batch.draw()
     batch2.draw()
-    update(velx)
+    update(velx, vely)
     collision()
 
 
