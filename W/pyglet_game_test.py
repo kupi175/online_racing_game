@@ -1,16 +1,23 @@
-'''pygame test'''
+'''                                             y            x,y
+pygame test                                     ^
+x-laius ja y-kõrgus, 0,0 on all vasakul       kõrgus
+2020 Tartu Ülikool                              ^
+Peeter Virk                                    0.0--laius--> x
+Walther Kraam
+'''
+
 import pyglet
 from pyglet.window import key, FPSDisplay, mouse
 from pyglet import shapes
 from random import randint
-import gameObjects
-import Code.duplicated.map_generator as mg
-#import UI
+import map_generator as mg
+
+# import UI
 
 playersFail = open('players.txt').read().split('\n')  # loeb playerite asukohad
 players = []
 for i in playersFail:
-    i= i.split(',')
+    i = i.split(',')
     players.append(i)
 playersLen = len(players)
 velx = 0
@@ -18,41 +25,59 @@ vely = 0.5
 ymod = 3
 xmod = 2
 playerRadius = 40
-ver = 'alpha 0.002'
+ver = 'alpha 0.003'
 
 window = pyglet.window.Window(width=1200, height=900, caption='test game', resizable=False, vsync=False)
-#window.set_location(650, 250)
 batch = pyglet.graphics.Batch()
+batch2 = pyglet.graphics.Batch()
 fps_display = FPSDisplay(window)
 fps_display.label.font_size = 20
 objects = players.copy()
 for i in range(len(players)):
-    player = shapes.Circle(int(players[1][0]), int(players[1][1]), radius=playerRadius, color=(55, 55, 255), batch=batch)
+    player = shapes.Circle(x=int(window.width//2), y=int(players[1][1]), radius=playerRadius, color=(55, 55, 255),
+                           batch=batch)
 
-#rect = shapes.Rectangle(400, 100 ,100,500,(255,45,56), batch=batch)
-#rect2 = shapes.Rectangle(0, 0,100,50,(255,255,56), batch=batch)
-seed = 69420
+seed = 150
 kaart = mg.game_map(seed, 100)
-kaart.get_map(start=1, end=2)
+kaardiAtribuudid = kaart.get_map(start=0, end=50)
+dst, ofs = kaardiAtribuudid
+laiuseKordaja = 400
+blokiKõrgus = 30
+print(dst, ofs)
+print(len(dst))
 rect = []
-for i in objects:
-    rect.append(shapes.Rectangle(int(i[0]), int(i[1]) ,100,50,(255,255,56), batch=batch))
+cnt = 0
 
-label = pyglet.text.Label('Py test game', font_size=26, x=window.width//2, y=window.height//2+300, anchor_x='center',
+for i in range(len(dst)):
+    offset = ofs[cnt]*laiuseKordaja*2
+    if offset < 250:
+        offset = 250
+    distance = dst[cnt]*laiuseKordaja+window.width//2-(window.width//4+100)
+    rect.append(shapes.Rectangle(x=0, y=cnt*blokiKõrgus, width=distance, height=blokiKõrgus, color=(77, 161, 82), batch=batch2))
+    rect.append(shapes.Rectangle(x=distance+offset, y=cnt*blokiKõrgus, width=window.width-(distance+offset), height=blokiKõrgus, color=(77, 161, 82), batch=batch2))
+    cnt += 1
+
+label = pyglet.text.Label('Py test game', font_size=26, x=window.width // 2, y=window.height // 2 + 300,
+                          anchor_x='center',
                           anchor_y='center', batch=batch)
-verLabel = pyglet.text.Label(str(ver), font_size=8, x = 0, y = 0, batch=batch)
+verLabel = pyglet.text.Label(str(ver), font_size=8, x=0, y=0, batch=batch)
+
 
 def otherPlayers(numOtherPlayers):
     global playerRadius
     otherPlayers = []
     for i in range(numOtherPlayers):
         others_radius = playerRadius
-        others_x = randint(0, window.width-others_radius)
-        others_y = randint(0, window.height-others_radius)
-        newOtherPlayers = shapes.Circle(x = others_x, y = others_y, radius = others_radius, color = (randint(25,255), randint(25,255), randint(25,255)), batch = batch)
+        others_x = randint(0, window.width - others_radius)
+        others_y = randint(0, window.height - others_radius)
+        newOtherPlayers = shapes.Circle(x=others_x, y=others_y, radius=others_radius,
+                                        color=(randint(25, 255), randint(25, 255), randint(25, 255)), batch=batch)
         otherPlayers.append(newOtherPlayers)
     return otherPlayers
+
+
 otherPlayersList = otherPlayers(2)
+
 
 def collision():  # vaatab, kas player on collisionis hetkel seinaga, mille nimi on rect
     global velx
@@ -63,26 +88,26 @@ def collision():  # vaatab, kas player on collisionis hetkel seinaga, mille nimi
         'down': False,
     }
     for i in rect:
-        if player.y+player.radius > i.y and player.y-player.radius < i.y+i.height: #collision detection parem-vasak
-            if i.x-2 < player.x+player.radius < i.x+10:
-                print('left')
+        if player.y + player.radius > i.y and player.y - player.radius < i.y + i.height:  # collision detection parem-vasak
+            if i.x - 2 < player.x + player.radius < i.x + 10:
+                # print('left')
                 colSide['left'] = True
             else:
                 colSide['left'] = False
-            if i.x+i.width-10 < player.x-player.radius < i.x+i.width+2:
-                print('right')
+            if i.x + i.width - 10 < player.x - player.radius < i.x + i.width + 2:
+                # print('right')
                 colSide['right'] = True
             else:
                 colSide['right'] = False
 
-        if i.x-2 < player.x+player.radius and player.x-player.radius < i.x+i.width+2: # alumine col.detect
-            if i.y-2 < player.y + player.radius < i.y:
-                print('down')
+        if i.x - 2 < player.x + player.radius and player.x - player.radius < i.x + i.width + 2:  # alumine col.detect
+            if i.y - 2 < player.y + player.radius < i.y:
+                # print('down')
                 colSide['down'] = True
             else:
                 colSide['down'] = False
-    #print(colSide)
-    #if rect.x < player.x+player.radius and player.x-player.radius < rect.x+rect.width:
+    # print(colSide)
+    # if rect.x < player.x+player.radius and player.x-player.radius < rect.x+rect.width:
     #    if rect.y <= player.y+player.radius and player.y-player.radius <= rect.y+rect.height:
     #        velx = 0
     if colSide['right'] == True or colSide['left'] == True:
@@ -92,11 +117,12 @@ def collision():  # vaatab, kas player on collisionis hetkel seinaga, mille nimi
         vely = 0
         return True
 
-        #print('collision')
-            #return True
+        # print('collision')
+        # return True
     else:
-        #print('no collision')
+        # print('no collision')
         return False
+
 
 def update(velx):
     player.x += velx
@@ -104,27 +130,29 @@ def update(velx):
         player.y += 0.1
 
     else:
-       player.y += vely
-    if player.y-player.radius >= window.height:
-        player.y = 0-player.radius
+        player.y += vely
+    if player.y - player.radius >= window.height:
+        player.y = 0 - player.radius
     if player.x >= window.width:
         player.x = 1
     if player.x < 0:
-        player.x = window.width-1
+        player.x = window.width - 1
+
 
 def draw_everything(dt):
     window.clear()
     fps_display.draw()
     batch.draw()
+    batch2.draw()
     update(velx)
     collision()
-
 
 
 @window.event
 def on_draw():
     draw_everything(None)
-    #print(player.y)
+    # print(player.y)
+
 
 @window.event
 def on_key_press(symbol, modifiers):
@@ -139,6 +167,7 @@ def on_key_press(symbol, modifiers):
     if symbol == key.UP:
         vely += ymod
 
+
 @window.event
 def on_key_release(symbol, modifiers):
     global velx
@@ -152,10 +181,11 @@ def on_key_release(symbol, modifiers):
     if symbol == key.UP:
         vely -= 0
 
-#event_logger = pyglet.window.event.WindowEventLogger()
-#window.push_handlers(event_logger)
 
-pyglet.clock.schedule_interval(draw_everything, 1/120)
+# event_logger = pyglet.window.event.WindowEventLogger()
+# window.push_handlers(event_logger)
+
+pyglet.clock.schedule_interval(draw_everything, 1 / 120)
 
 print(__name__)
 if __name__ == 'pyglet_game_test':
