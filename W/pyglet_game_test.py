@@ -171,7 +171,7 @@ def update(colSide):  # tuleb implemeteerida colSide lybrariga collision side ja
             if vely > velyMax:
                 vely = velyMax
     else:
-        if vely > 0.1:
+        if vely > 0.01:
             vely -= 0.1
     if 's' in keys:
         if vely > 0:
