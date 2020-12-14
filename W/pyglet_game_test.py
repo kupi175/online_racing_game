@@ -4,6 +4,12 @@ x-laius ja y-kõrgus, 0,0 on all vasakul       kõrgus
 2020 Tartu Ülikool                              ^
 Peeter Virk                                    0.0--laius--> x
 Walther Kraam
+-------
+player movement
+vel - is calculated through the mod variable
+mod - change in velocity
+arrow buttons only change the mod variable!
+-------
 '''
 
 import pyglet
@@ -21,13 +27,16 @@ for i in playersFail:
     i = i.split(',')
     players.append(i)
 playersLen = len(players)
+
 velx = 0
 vely = 0
-ymod = 3
-xmod = 0.5
+velxMax = 4
+velyMax = 4
+ymod = 1
+xmod = 0.2
 playerRadius = 40
-ver = 'alpha 0.003'
-
+keys = []  # for keys that are held down
+ver = 'beta 0.010'
 window = pyglet.window.Window(width=1200, height=500, caption='test game', resizable=False, vsync=False)
 
 batch = pyglet.graphics.Batch()
@@ -36,19 +45,18 @@ batch2 = pyglet.graphics.Batch()
 fps_display = FPSDisplay(window)
 fps_display.label.font_size = 20
 
-player = shapes.Circle(x=int(window.width // 2), y=10, radius=playerRadius, color=(55, 55, 255), batch=batch)
+player = shapes.Circle(x=window.width // 2, y=10, radius=playerRadius, color=(55, 55, 255), batch=batch)
 
 
 def collidables(rect):  # this checks if the side wall is within the checkable area of the player
     global player
     collidableBoxes = []
     for row in rect[::2]:  # this checks with the leftmost box of the row
-        if player.y-player.radius < row.y+row.height//2 < player.y+player.radius*3:
-            print(row.y)
+        if player.y - player.radius < row.y + row.height // 2 < player.y + player.radius * 3:
+            # print(row.y)
             collidableBoxes.append(row)  # the left box of the row
-            collidableBoxes.append(rect[rect.index(row)+1])  # the right box of the row
+            collidableBoxes.append(rect[rect.index(row) + 1])  # the right box of the row
     return collidableBoxes
-
 
 
 def genMap():
@@ -59,8 +67,8 @@ def genMap():
     dst, ofs = kaardiAtribuudid
     laiuseKordaja = 400
     blokiKõrgus = 30
-    #print(dst, ofs)
-    #print(len(dst))
+    # print(dst, ofs)
+    # print(len(dst))
     rect = []
     cnt = 0
 
@@ -74,7 +82,7 @@ def genMap():
         rect.append(shapes.Rectangle(x=distance + offset, y=cnt * blokiKõrgus, width=window.width - (distance + offset),
                                      height=blokiKõrgus, color=(77, 161, 82), batch=batch2))
         cnt += 1
-    #print(rect)
+    # print(rect)
     print(len(rect))
 
 
@@ -106,26 +114,30 @@ def collisionCheck(rect):  # vaatab, kas player on collisionis hetkel seinaga, m
         'left': False,
         'down': False,
     }
+    playerNextPosY = player.y + vely  # kus on player enda järgmise ticki ajal y-suunal
+    playerNextPosX = player.x + velx  # kus on player enda järgmise ticki ajal x-suunal
 
     for box in rect:
-        if player.y + player.radius > box.y and player.y - player.radius < box.y + box.height:  # collision detection parem-vasak
-            if box.x - 2 < player.x + player.radius < box.x + 10:
-                # print('left')
+        if box.y < playerNextPosY + player.radius and playerNextPosY - player.radius < box.y + box.height:  # collision detection parem-vasak
+            if box.x - 2 <= playerNextPosX + player.radius <= box.x + 2:
+                print('left')
                 side['left'] = True
             else:
                 side['left'] = False
-            if box.x + box.width - 10 < player.x - player.radius < box.x + box.width + 2:
-                # print('right')
+            if box.x + box.width - 2 <= playerNextPosX - player.radius <= box.x + box.width + 2:
+                print('right')
                 side['right'] = True
             else:
                 side['right'] = False
 
-        if box.x - 2 < player.x + player.radius and player.x - player.radius < box.x + box.width + 2:  # alumine col.detect
-            if box.y - 2 < player.y + player.radius < box.y:
+        if box.x - 2 < playerNextPosX + player.radius and playerNextPosX - player.radius < box.x + box.width + 2:  # alumine col.detect
+            if box.y - 2 < playerNextPosY + player.radius < box.y:
                 # print('down')
                 side['down'] = True
             else:
                 side['down'] = False
+        if True in side.values():
+            return side
     return side
     # print(colSide)
     # if rect.x < player.x+player.radius and player.x-player.radius < rect.x+rect.width:
@@ -133,16 +145,59 @@ def collisionCheck(rect):  # vaatab, kas player on collisionis hetkel seinaga, m
     #        velx = 0
 
 
-def update(velx, vely, colSide):  # tuleb implemeteerida colSide lybrariga collision side ja sellega seoses olev liikumise kiirus
-    player.x += velx
-    if colSide['right'] == True or colSide['left'] == True:
-        print(colSide)
-        player.y += 0.1
-    if colSide['down'] == True:
-        player.y += 0
+def update(colSide):  # tuleb implemeteerida colSide lybrariga collision side ja sellega seoses olev liikumise kiirus
+    global velx, vely, ymod, xmod
+    #print(keys) #  for debug
+    #horisontaalne liikumine <----->
+    if 'd' in keys:
+        if velx <= velxMax:
+            velx += xmod
+    elif 'a' not in keys:
+        velx -= xmod
+        if velx < 0.5:
+            velx = 0
 
+    if 'a' in keys:
+        if velx >= -velxMax:
+            velx -= xmod
+    elif 'd' not in keys:
+        velx += xmod
+        if velx > -0.5:
+            velx = 0
+    #vertikaalne liikumine ^\v
+    if 'w' in keys:
+        if vely <= velyMax:
+            vely += ymod
+            if vely > velyMax:
+                vely = velyMax
     else:
-        player.y += vely
+        if vely > 0.1:
+            vely -= 0.1
+    if 's' in keys:
+        if vely > 0:
+            vely -= 0.01
+            if vely < 0.02:
+                vely = 0
+
+
+
+    # kui on collision seinaga, siis ta vertikaalne(y) kiirus on 0.1 ja horisontaalne(x) kiirus 0
+    # ning ei saa liikuda sinna suunas, kus on sein ees.
+    '''if colSide['right'] == True or colSide['left'] == True:
+        xmod = 0
+        ymod = 0
+        vely = 0.1
+
+        if colSide['right'] == True and 'a' in keys:
+            xmod = 0
+        if colSide['left'] == True and 'd' in keys:
+            xmod = 0'''
+
+    #playeri uue asukoha välja arvutamine
+    player.x += velx
+    player.y += vely
+
+    # playeri asukoht siis kui ta on ekraani piirides, peaks ta sinna juhtuma
     if player.y - player.radius >= window.height:
         genMap()  # ------------kui player liigub ekraani ülemisse serva, tehakse uus map-------------------
         player.y = 0 - player.radius
@@ -153,14 +208,14 @@ def update(velx, vely, colSide):  # tuleb implemeteerida colSide lybrariga colli
 
 
 def draw_everything(dt):
+    global keys
     window.clear()
     batch.draw()
     batch2.draw()
     colRect = collidables(rect)  # who is collidable
     colSide = collisionCheck(colRect)  # checks the collision side
-    update(velx, vely, colSide)  # updates the player movement and the scene
+    update(colSide)  # updates the player movement and the scene
     fps_display.draw()
-
 
 @window.event
 def on_draw():
@@ -168,50 +223,30 @@ def on_draw():
 
 
 @window.event
-def on_key_press(symbol, modifiers):
-    global velx
-    global vely
-    global xmod
-    global ymod
-    if symbol == key.LEFT:
-        if modifiers & key.MOD_CTRL:
-            velx -= xmod // 2
-        elif modifiers & key.MOD_SHIFT:
-            velx -= xmod * 2
-        else:
-            velx -= xmod
-    if symbol == key.RIGHT:
-        if modifiers & key.MOD_CTRL:
-            velx += xmod // 2
-        elif modifiers & key.MOD_SHIFT:
-            velx += xmod * 2
-        else:
-            velx += xmod
-    if symbol == key.UP:
-        if modifiers & key.MOD_CTRL:
-            pass
-            # vely += ymod / 2-ei tööta kuna key release on -ymod
-        elif modifiers & key.MOD_SHIFT:
-            vely += ymod * 2
-        else:
-            vely += ymod
+def on_key_press(symbol, modyfiers):
+    if symbol == key.LEFT or symbol == key.A:
+        keys.append('a')
+    if symbol == key.RIGHT or symbol == key.D:
+        keys.append('d')
+    if symbol == key.UP or symbol == key.W:
+        keys.append('w')
+    if symbol == key.DOWN or symbol == key.S:
+        keys.append('s')
 
 
 @window.event
-def on_key_release(symbol, modifiers):
-    global velx
-    global vely
-    if symbol == key.LEFT:
-        velx = 0
-
-    if symbol == key.RIGHT:
-        velx = 0
-
-    if symbol == key.UP:
-        vely -= ymod
+def on_key_release(symbol, modyfiers):
+    if symbol == key.LEFT or symbol == key.A:
+        keys.remove('a')
+    if symbol == key.RIGHT or symbol == key.D:
+        keys.remove('d')
+    if symbol == key.UP or symbol == key.W:
+        keys.remove('w')
+    if symbol == key.DOWN or symbol == key.S:
+        keys.remove('s')
 
 
-# event_logger = pyglet.window.event.WindowEventLogger()
+    # event_logger = pyglet.window.event.WindowEventLogger()
 # window.push_handlers(event_logger)
 
 pyglet.clock.schedule_interval(draw_everything, 1 / 120)

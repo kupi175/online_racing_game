@@ -6,7 +6,7 @@ button_color = (148, 252, 255)
 button_hover = (208, 254, 255)
 button_press = (162, 216, 218)
 
-window = pyglet.window.Window(width=1200, height=900, caption='test game', resizable=False, vsync=False )
+window = pyglet.window.Window(width=1200, height=500, caption='test game', resizable=False, vsync=False )
 batchMenu = pyglet.graphics.Batch()
 
 
