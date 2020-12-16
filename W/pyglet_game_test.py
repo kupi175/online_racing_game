@@ -10,6 +10,8 @@ vel - is calculated through the mod variable
 mod - change in velocity
 arrow buttons only change the mod variable!
 -------
+milline võiks näha välja serverile saadetav info(player_x, player_y)
+serverilt tulev info(kas mäng käib? 1/0 , teiste playerite x/y list[(x1,y1),(x2,y2),...,(xn,yn)])
 '''
 
 import pyglet
@@ -36,7 +38,7 @@ ymod = 0.01
 xmod = 0.2
 playerRadius = 40
 keys = []  # for keys that are held down
-ver = 'beta 0.025'
+ver = 'beta 0.04' #  0.05 on siis kui networkingu tehtud saab - teised playerid tulevad nähtavale
 window = pyglet.window.Window(width=1200, height=500, caption='test game', resizable=False, vsync=False)
 
 batch = pyglet.graphics.Batch()
@@ -49,29 +51,44 @@ fps_display.label.font_size = 20
 player = shapes.Circle(x=window.width // 2, y=10, radius=playerRadius, color=(55, 55, 255), batch=batch)
 
 
+def genStagingarea(list,start , len, color=(255, 255, 255), blokiKõrgus = 30):
+    len=start+len
+    for block in range(start, len):
+        list.append(shapes.Rectangle(x=0, y=block * blokiKõrgus, width=window.width//4+100, height=blokiKõrgus, color=color,
+                                     batch=batchBlock))
+        list.append(shapes.Rectangle(x=window.width//4+500, y=block * blokiKõrgus, width=window.width - (window.width//4+500),
+                                     height=blokiKõrgus, color=color, batch=batchBlock))
+    return list
+
 def genMap():
     global rect, player
+    mapLength = 200
+    startFinishLength = 10
     seed = int(time.time() // randint(1, 1000))
     kaart = mg.game_map(seed, 100)
-    kaardiAtribuudid = kaart.get_map(start=0, end=450)
+    kaardiAtribuudid = kaart.get_map(start=0, end=mapLength)
     dst, ofs = kaardiAtribuudid
     laiuseKordaja = 400
     blokiKõrgus = 30
+    blockColor = (124, 230, 112)
     # print(dst, ofs)
     # print(len(dst))
     rect = []
     cnt = 0
+    rect = genStagingarea(rect, 0, startFinishLength, color=(38, 255, 38))
 
-    for i in range(len(dst)):
+    for i in range(startFinishLength, len(dst)):
         offset = ofs[cnt] * laiuseKordaja * 2
         if offset < 250:
             offset = 250
         distance = dst[cnt] * laiuseKordaja + window.width // 2 - (window.width // 4 + 100)
-        rect.append(shapes.Rectangle(x=0, y=cnt * blokiKõrgus, width=distance, height=blokiKõrgus, color=(77, 161, 82),
+        rect.append(shapes.Rectangle(x=0, y=i * blokiKõrgus, width=distance, height=blokiKõrgus, color=blockColor,
                                      batch=batchBlock))
-        rect.append(shapes.Rectangle(x=distance + offset, y=cnt * blokiKõrgus, width=window.width - (distance + offset),
-                                     height=blokiKõrgus, color=(77, 161, 82), batch=batchBlock))
+        rect.append(shapes.Rectangle(x=distance + offset, y=i * blokiKõrgus, width=window.width - (distance + offset),
+                                     height=blokiKõrgus, color=blockColor, batch=batchBlock))
         cnt += 1
+
+    rect = genStagingarea(rect, mapLength, startFinishLength, color=(255, 38, 38))
     # print(rect)
     print(len(rect))
 
@@ -89,9 +106,6 @@ def otherPlayers(numOtherPlayers):
                                         color=(randint(25, 255), randint(25, 255), randint(25, 255)), batch=batch)
         otherPlayers.append(newOtherPlayers)
     return otherPlayers
-
-
-otherPlayersList = otherPlayers(2)
 
 
 def collidables(rect):  # this checks if the side wall is within the checkable area of the player
@@ -137,6 +151,8 @@ def collisionCheck(rect):  # vaatab, kas player on collisionis hetkel seinaga, m
 
 def update(colSide):  # tuleb implemeteerida colSide lybrariga collision side ja sellega seoses olev liikumise kiirus
     global velx, vely, ymod, xmod
+
+    otherPlayersList = otherPlayers(10)
 
     # kui on collision seinaga, siis ta vertikaalne(y) kiirus on 0.1 ja horisontaalne(x) kiirus 0
     # ning ei saa liikuda sinna suunas, kus on sein ees.
@@ -208,8 +224,15 @@ def update(colSide):  # tuleb implemeteerida colSide lybrariga collision side ja
     if player.x < 0:
         player.x = window.width - 1
 
+
 def getOthersPos(positionInfo):
+    # todo: siia teha, et ta saaks teiste playerite asukoha.
     pass
+
+def sendToServer(playerPosition):
+    # todo: siia teha, et saata serverile asukohainfo.
+    pass
+
 
 def draw_everything(dt):
     global keys, colRect
@@ -220,6 +243,7 @@ def draw_everything(dt):
     colSide = collisionCheck(colRect)  # checks the collision side
     update(colSide)  # updates the player movement and the scene
     fps_display.draw()
+    #todo: saata serverile enda asukoht(x_player ja  y_blokide_kaugus), võibolla isegi update funktsiooni sees
 
 
 @window.event
