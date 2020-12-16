@@ -9,7 +9,6 @@ button_press = (162, 216, 218)
 window = pyglet.window.Window(width=1200, height=500, caption='test game', resizable=False, vsync=False )
 batchMenu = pyglet.graphics.Batch()
 
-
 gameButton = shapes.Rectangle(1200//2-150, 300, 300, 100, button_color, batch=batchMenu)
 gameButtonState = 0
 
