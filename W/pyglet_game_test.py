@@ -46,8 +46,9 @@ batchBlock = pyglet.graphics.Batch()
 
 # ------------------Win Condition---------------------------
 batchWin = pyglet.graphics.Batch()
+batchWinText = pyglet.graphics.Batch()
 gameText = pyglet.text.Label('YOU WIN', font_size=36, x=window.width // 2, y=window.height // 2,
-                             batch=batchWin, anchor_x='center', anchor_y='center')
+                             batch=batchWinText, anchor_x='center', anchor_y='center')
 
 button_color = (148, 252, 255)
 button_hover = (208, 254, 255)
@@ -57,7 +58,7 @@ gameButton = shapes.Rectangle(1200 // 2 - 150, 300, 300, 100, button_color, batc
 gameButtonState = 0
 buttonText = pyglet.text.Label('Restart', font_size=36, x=gameButton.x + gameButton.width // 2,
                              y=gameButton.y + gameButton.height // 2,
-                             batch=batchWin, anchor_x='center', anchor_y='center')
+                             batch=batchWinText, anchor_x='center', anchor_y='center')
 
 # ----------------------------------------------------------
 
@@ -262,7 +263,7 @@ def sendToServer(playerPosition):
 
 
 def draw_everything(dt):
-    global winCondition, rect, velyMax
+    global winCondition, rect, velyMax, vely, velx
     if winCondition == False:
         global keys, colRect
         window.clear()
@@ -275,8 +276,11 @@ def draw_everything(dt):
     else:
         window.clear()
         batchWin.draw()
+        batchWinText.draw()
         rect = []
-        velyMax += 0.5
+        vely = 0
+        velx = 0
+        velyMax += 0.0005
         if gameButtonState == 1:
             winCondition = False
             genMap()

@@ -95,6 +95,6 @@ def on_mouse_release(x, y, button, modifiers):
 #event_logger = pyglet.window.event.WindowEventLogger()
 #window.push_handlers(event_logger)
 print(__name__)
-pyglet.clock.schedule_interval(draw_everything, 1/120)
+pyglet.clock.schedule_interval(draw_everything, 1/90)
 if __name__ == 'UI':
     main()
