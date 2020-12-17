@@ -14,9 +14,6 @@ class game_map:
         self.noise = OpenSimplex(seed=seed)
         self.seed = seed
         self.length = length * 10
-        for i in range(0, self.length):
-            self.generated_map = (self.noise.noise2d(i, 0) + 1) * 20  # generate a string of noise
-            print(self.generated_map)
 
     def get_map(self, start, end):
         ret1 = [self.get_noise_point(x, 0) for x in range(start, end)]

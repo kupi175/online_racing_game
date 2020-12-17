@@ -4,14 +4,6 @@ x-laius ja y-kõrgus, 0,0 on all vasakul       kõrgus
 2020 Tartu Ülikool                              ^
 Peeter Virk                                    0.0--laius--> x
 Walther Kraam
--------
-player movement
-vel - is calculated through the mod variable
-mod - change in velocity
-arrow buttons only change the mod variable!
--------
-milline võiks näha välja serverile saadetav info(player_x, player_y)
-serverilt tulev info(kas mäng käib? 1/0 , teiste playerite x/y list[(x1,y1),(x2,y2),...,(xn,yn)])
 '''
 
 import pyglet
@@ -41,6 +33,7 @@ keys = []  # for keys that are held down
 ver = 'beta 0.045'  # 0.05 on siis kui networkingu tehtud saab - teised playerid tulevad nähtavale
 window = pyglet.window.Window(width=1200, height=500, caption='test game', resizable=False, vsync=False)
 
+window = pyglet.window.Window(width=1200, height=1100, caption='test game', resizable=False, vsync=False)
 batch = pyglet.graphics.Batch()
 batchBlock = pyglet.graphics.Batch()
 
@@ -291,6 +284,7 @@ def draw_everything(dt):
 @window.event
 def on_draw():
     draw_everything(None)
+    # print(player.y)
 
 
 @window.event
