@@ -33,16 +33,33 @@ playersLen = len(players)
 velx = 0
 vely = 0
 velxMax = 4
-velyMax = 4
+velyMax = 3
 ymod = 0.01
 xmod = 0.2
 playerRadius = 40
 keys = []  # for keys that are held down
-ver = 'beta 0.04' #  0.05 on siis kui networkingu tehtud saab - teised playerid tulevad nähtavale
+ver = 'beta 0.045'  # 0.05 on siis kui networkingu tehtud saab - teised playerid tulevad nähtavale
 window = pyglet.window.Window(width=1200, height=500, caption='test game', resizable=False, vsync=False)
 
 batch = pyglet.graphics.Batch()
 batchBlock = pyglet.graphics.Batch()
+
+# ------------------Win Condition---------------------------
+batchWin = pyglet.graphics.Batch()
+gameText = pyglet.text.Label('YOU WIN', font_size=36, x=window.width // 2, y=window.height // 2,
+                             batch=batchWin, anchor_x='center', anchor_y='center')
+
+button_color = (148, 252, 255)
+button_hover = (208, 254, 255)
+button_press = (162, 216, 218)
+
+gameButton = shapes.Rectangle(1200 // 2 - 150, 300, 300, 100, button_color, batch=batchWin)
+gameButtonState = 0
+buttonText = pyglet.text.Label('Restart', font_size=36, x=gameButton.x + gameButton.width // 2,
+                             y=gameButton.y + gameButton.height // 2,
+                             batch=batchWin, anchor_x='center', anchor_y='center')
+
+# ----------------------------------------------------------
 
 
 fps_display = FPSDisplay(window)
@@ -51,14 +68,17 @@ fps_display.label.font_size = 20
 player = shapes.Circle(x=window.width // 2, y=10, radius=playerRadius, color=(55, 55, 255), batch=batch)
 
 
-def genStagingarea(list,start , len, color=(255, 255, 255), blokiKõrgus = 30):
-    len=start+len
+def genStagingarea(list, start, len, color=(255, 255, 255), blokiKõrgus=30):
+    len = start + len
     for block in range(start, len):
-        list.append(shapes.Rectangle(x=0, y=block * blokiKõrgus, width=window.width//4+100, height=blokiKõrgus, color=color,
-                                     batch=batchBlock))
-        list.append(shapes.Rectangle(x=window.width//4+500, y=block * blokiKõrgus, width=window.width - (window.width//4+500),
+        list.append(
+            shapes.Rectangle(x=0, y=block * blokiKõrgus, width=window.width // 4 + 100, height=blokiKõrgus, color=color,
+                             batch=batchBlock))
+        list.append(shapes.Rectangle(x=window.width // 4 + 500, y=block * blokiKõrgus,
+                                     width=window.width - (window.width // 4 + 500),
                                      height=blokiKõrgus, color=color, batch=batchBlock))
     return list
+
 
 def genMap():
     global rect, player
@@ -91,6 +111,7 @@ def genMap():
     rect = genStagingarea(rect, mapLength, startFinishLength, color=(255, 38, 38))
     # print(rect)
     print(len(rect))
+
 
 verLabel = pyglet.text.Label(str(ver), font_size=8, x=0, y=0, batch=batch)
 
@@ -149,8 +170,14 @@ def collisionCheck(rect):  # vaatab, kas player on collisionis hetkel seinaga, m
     return side
 
 
+winCondition = False
+
+
 def update(colSide):  # tuleb implemeteerida colSide lybrariga collision side ja sellega seoses olev liikumise kiirus
-    global velx, vely, ymod, xmod
+    global velx, vely, ymod, xmod, winCondition
+
+    if player.y >= rect[-1].y:
+        winCondition = True
 
     otherPlayersList = otherPlayers(10)
 
@@ -211,7 +238,6 @@ def update(colSide):  # tuleb implemeteerida colSide lybrariga collision side ja
                 del rect[0]
                 del rect[1]
 
-
     # teiste playerite asukohtade uuendamine
     getOthersPos(otherPlayersList)
 
@@ -229,21 +255,33 @@ def getOthersPos(positionInfo):
     # todo: siia teha, et ta saaks teiste playerite asukoha.
     pass
 
+
 def sendToServer(playerPosition):
     # todo: siia teha, et saata serverile asukohainfo.
     pass
 
 
 def draw_everything(dt):
-    global keys, colRect
-    window.clear()
-    batch.draw()
-    batchBlock.draw()
-    colRect = collidables(rect)  # who is collidable
-    colSide = collisionCheck(colRect)  # checks the collision side
-    update(colSide)  # updates the player movement and the scene
-    fps_display.draw()
-    #todo: saata serverile enda asukoht(x_player ja  y_blokide_kaugus), võibolla isegi update funktsiooni sees
+    global winCondition, rect, velyMax
+    if winCondition == False:
+        global keys, colRect
+        window.clear()
+        batch.draw()
+        batchBlock.draw()
+        colRect = collidables(rect)  # who is collidable
+        colSide = collisionCheck(colRect)  # checks the collision side
+        update(colSide)  # updates the player movement and the scene
+        fps_display.draw()
+    else:
+        window.clear()
+        batchWin.draw()
+        rect = []
+        velyMax += 0.5
+        if gameButtonState == 1:
+            winCondition = False
+            genMap()
+
+    # todo: saata serverile enda asukoht(x_player ja  y_blokide_kaugus), võibolla isegi update funktsiooni sees
 
 
 @window.event
@@ -275,6 +313,43 @@ def on_key_release(symbol, modyfiers):
         keys.remove('s')
 
     # event_logger = pyglet.window.event.WindowEventLogger()
+
+
+@window.event
+def on_mouse_motion(x, y, dx, dy):
+    if gameButton.x < x < gameButton.x + gameButton.width:
+        if gameButton.y < y < gameButton.y + gameButton.height:
+            gameButton.color = button_hover
+        else:
+            gameButton.color = button_color
+    else:
+        gameButton.color = button_color
+
+
+@window.event
+def on_mouse_press(x, y, button, modifiers):
+    global gameButtonState
+
+    if button == pyglet.window.mouse.LEFT:
+        if gameButton.x < x < gameButton.x + gameButton.width:
+            if gameButton.y < y < gameButton.y + gameButton.height:
+                gameButton.color = button_press
+                gameButtonState = 1
+
+
+@window.event
+def on_mouse_release(x, y, button, modifiers):
+    global gameButtonState
+
+    if button == pyglet.window.mouse.LEFT:
+        if gameButton.x < x < gameButton.x + gameButton.width:
+            if gameButton.y < y < gameButton.y + gameButton.height:
+                gameButton.color = button_hover
+                gameButtonState = 0
+            else:
+                gameButton.color = button_color
+        else:
+            gameButton.color = button_color
 
 
 # window.push_handlers(event_logger)
