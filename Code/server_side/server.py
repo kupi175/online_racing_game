@@ -10,11 +10,7 @@ port = 12345
 
 general_player_pool = set()
 queued_player_pool = set()
-'''
-Todo: create a game creators
- random matchmaking: start with random map settings. create a player pool to take players out of when the critical mass has been reached after a race players are deposited back into the player pool
- custom match: host player creates game, picks settings: seed (random, predefined), lapped or non lapped, if lapped then how many laps, possible ability to manipulate the speed of the players.
-'''
+
 
 def player_creator(host, port):  # handle new players
     import socket  # import socket to be used by this function
